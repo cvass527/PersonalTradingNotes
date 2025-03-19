@@ -314,4 +314,4 @@ def save_contract(n_clicks, name, tick_value, tick_size):
 if __name__ == '__main__':
     # Initialize contracts file if not exists
     load_contracts()
-    app.run_server(debug=True)
+    app.run(debug=True)
