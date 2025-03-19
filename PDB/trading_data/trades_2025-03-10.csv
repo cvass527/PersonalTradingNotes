@@ -1,0 +1,14 @@
+Working Orders
+"Account","Status","Buy/Sell","Qty To Fill","Max Show Qty","Symbol","Price Type","Limit Price","Qty Filled","Qty Working","Order Number","Original Sequence Number","Current Sequence Number","User Id","Exchange Order Id","Update Time (CDT)","Expiration Month","Stop/Trigger Price","Duration","Avg Fill Price","Position Disposition","IB Id","FCM Id","Create Time (CDT)","Liquidity Indicator","Executing Venue"
+
+
+Completed Orders
+"Account","Status","Remarks","Buy/Sell","Qty To Fill","Max Show Qty","Symbol","Price Type","Avg Fill Price","Limit Price","Order Number","Original Sequence Number","Current Sequence Number","User Id","Update Time (CDT)","Create Time (CDT)","Liquidity Indicator","Executing Venue"
+"188076","Filled","","B","1","","ESH5","L","5617.7500","5619.00","85969716","HQ2Q9","HQ2Q9","connor_vass@amp.com","2025-03-10 15:00:37","2025-03-10 15:00:37","",""
+"188076","Filled","","B","1","","ESH5","L","5617.5000","5617.50","85969714","HQ2Q6","HQ2Q6","connor_vass@amp.com","2025-03-10 15:00:36","2025-03-10 15:00:36","",""
+"188076","Filled","","B","1","","ESH5","L","5618.5000","5619.50","85969675","HQ2OB","HQ2OB","connor_vass@amp.com","2025-03-10 15:00:17","2025-03-10 15:00:17","",""
+"188076","Filled","","B","1","","ESH5","L","5618.7500","5622.00","85969672","HQ2O1","HQ2O1","connor_vass@amp.com","2025-03-10 15:00:10","2025-03-10 15:00:10","",""
+"188076","Filled","","B","1","","ESH5","L","5620.0000","5620.50","85969669","HQ2NX","HQ2NX","connor_vass@amp.com","2025-03-10 14:59:59","2025-03-10 15:00:08","",""
+"188076","Filled","","S","5","","ESH5","L","5624.2500","5624.25","85969638","HQ2MF","HQ2MF","connor_vass@amp.com","2025-03-10 14:59:59","2025-03-10 14:59:53","",""
+
+
