@@ -1,3 +1,5 @@
+
+
 import dash  # Add this import at the top
 import pandas as pd
 import plotly.express as px
@@ -5,6 +7,7 @@ import json
 import os
 from datetime import datetime, timedelta
 from dash import Dash, dcc, html, dash_table, Input, Output, State
+
 
 # Configuration
 DATA_DIR = 'trading_data'
@@ -245,11 +248,12 @@ def update_date(prev_clicks, next_clicks, current_date):
 def update_dashboard(date_str):
     file_path = os.path.join(DATA_DIR, f'trades_{date_str}.xlsx')
     try:
+        note = load_notes(date_str)
         df = pd.read_excel(file_path, sheet_name='tt-export', header=None)
         df.columns = ["date", "time", "exchange", "contract", "B/S", "Size", "Price", "F", "Direct"]
         processed_df = process_raw_data(df)
         trades_df = calculate_trades(processed_df)
-        note = load_notes(date_str)
+
         return create_dashboard(trades_df), note
     except FileNotFoundError:
         return html.H3("No data available for this date"), ''
