@@ -1,5 +1,3 @@
-
-
 import dash  # Add this import at the top
 import pandas as pd
 import plotly.express as px
@@ -7,7 +5,6 @@ import json
 import os
 from datetime import datetime, timedelta
 from dash import Dash, dcc, html, dash_table, Input, Output, State
-
 
 # Configuration
 DATA_DIR = 'trading_data'
@@ -168,7 +165,7 @@ def create_dashboard(trades_df, note=''):
 
 # App layout
 app.layout = html.Div([
-    dcc.Store(id='current-date', data='2025-02-05'),
+    dcc.Store(id='current-date'),
     dcc.Tabs([
         dcc.Tab(label='Daily View', children=[
             html.Div([
@@ -214,7 +211,6 @@ app.layout = html.Div([
 
 
 # Callbacks
-# Update the problematic callback
 @app.callback(
     [Output('current-date', 'data'),
      Output('date-display', 'children')],
@@ -223,21 +219,29 @@ app.layout = html.Div([
     [State('current-date', 'data')]
 )
 def update_date(prev_clicks, next_clicks, current_date):
-    ctx = dash.callback_context  # Now properly referenced
-    if not ctx.triggered:
-        return current_date, f"Current Date: {current_date}"
+    ctx = dash.callback_context
+    if not ctx.triggered or not current_date:
+        # On initial load, show today's date
+        today = datetime.now()
+        return today.strftime('%Y-%m-%d'), f"Current Date: {today.strftime('%B %d, %Y')}"
 
     button_id = ctx.triggered[0]['prop_id'].split('.')[0]
     current_dt = datetime.strptime(current_date, '%Y-%m-%d')
 
-    if button_id == 'prev-day':
-        new_dt = current_dt - timedelta(days=1)
-    elif button_id == 'next-day':
-        new_dt = current_dt + timedelta(days=1)
-    else:
-        return current_date, f"Current Date: {current_date}"
+    def get_next_valid_date(dt, direction):
+        while True:
+            dt = dt + timedelta(days=direction)
+            if dt.weekday() != 5:  # Skip Saturday (5)
+                return dt
 
-    return new_dt.strftime('%Y-%m-%d'), f"Current Date: {new_dt.strftime('%Y-%m-%d')}"
+    if button_id == 'prev-day':
+        new_dt = get_next_valid_date(current_dt, -1)
+    elif button_id == 'next-day':
+        new_dt = get_next_valid_date(current_dt, 1)
+    else:
+        return current_date, f"Current Date: {current_dt.strftime('%B %d, %Y')}"
+
+    return new_dt.strftime('%Y-%m-%d'), f"Current Date: {new_dt.strftime('%B %d, %Y')}"
 
 
 @app.callback(
@@ -246,17 +250,27 @@ def update_date(prev_clicks, next_clicks, current_date):
     [Input('current-date', 'data')]
 )
 def update_dashboard(date_str):
+    # Always load notes for the date
+    note = load_notes(date_str)
+    
+    # Try to load trades data
     file_path = os.path.join(DATA_DIR, f'trades_{date_str}.xlsx')
     try:
-        note = load_notes(date_str)
         df = pd.read_excel(file_path, sheet_name='tt-export', header=None)
         df.columns = ["date", "time", "exchange", "contract", "B/S", "Size", "Price", "F", "Direct"]
         processed_df = process_raw_data(df)
         trades_df = calculate_trades(processed_df)
-
         return create_dashboard(trades_df), note
     except FileNotFoundError:
-        return html.H3("No data available for this date"), ''
+        # Return empty dashboard with just the date display
+        return html.Div([
+            html.H3(f"No trading data available for {date_str}"),
+            html.Div([
+                html.H3("Trade Summary", style={'color': '#2c3e50'}),
+                html.P("Total PnL: $0.00", style={'fontSize': 18}),
+                html.P("Total Trades: 0")
+            ], style={'margin': '20px', 'padding': '15px', 'borderRadius': '5px', 'backgroundColor': '#f8f9fa'})
+        ]), note
 
 
 def load_notes(date_str):
