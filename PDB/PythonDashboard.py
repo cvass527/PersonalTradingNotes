@@ -42,6 +42,77 @@ def process_raw_data(df):
     df = df.sort_values('datetime').reset_index(drop=True)
     return df
 
+def calculate_trades_csv(df):
+    contracts = load_contracts()
+    trades = []
+    open_positions = {}  # Tracks positions by base contract
+
+    for _, row in df.iterrows():
+        full_contract = row['Symbol']
+        base_contract = full_contract.split()[0]
+        action = row['Action']
+        size = row['Quantity']
+        price = row['Price']
+        timestamp = row['datetime']
+
+        # Initialize position tracking for new contracts
+        if base_contract not in open_positions:
+            open_positions[base_contract] = {
+                'position': 0,
+                'entry_price': None,
+                'entry_time': None,
+                'entry_action': None
+            }
+
+        # Update position
+        prev_position = open_positions[base_contract]['position']
+        new_position = prev_position + (size if action == 'B' else -size)
+
+        # Handle position changes
+        if prev_position == 0 and new_position != 0:
+            # New position opened
+            open_positions[base_contract].update({
+                'position': new_position,
+                'entry_price': price,
+                'entry_time': timestamp,
+                'entry_action': action
+            })
+        elif new_position == 0 and prev_position != 0:
+            # Position closed
+            entry_price = open_positions[base_contract]['entry_price']
+            entry_time = open_positions[base_contract]['entry_time']
+            entry_action = open_positions[base_contract]['entry_action']
+
+            specs = contracts[base_contract]
+            price_diff = (price - entry_price) if entry_action == 'B' else (entry_price - price)
+            ticks = price_diff / specs['tick_size']
+            pnl = ticks * specs['tick_value'] * abs(prev_position)
+
+            trades.append({
+                'contract': full_contract,
+                'entry_time': entry_time,
+                'exit_time': timestamp,
+                'duration': timestamp - entry_time,
+                'entry_price': entry_price,
+                'exit_price': price,
+                'quantity': abs(prev_position),
+                'pnl': pnl,
+                'direction': 'Long' if entry_action == 'B' else 'Short'
+            })
+
+            # Reset position
+            open_positions[base_contract] = {
+                'position': 0,
+                'entry_price': None,
+                'entry_time': None,
+                'entry_action': None
+            }
+        else:
+            # Update existing position
+            open_positions[base_contract]['position'] = new_position
+
+    return pd.DataFrame(trades)
+
 
 def calculate_trades(df):
     contracts = load_contracts()
@@ -262,15 +333,28 @@ def update_dashboard(date_str):
         trades_df = calculate_trades(processed_df)
         return create_dashboard(trades_df), note
     except FileNotFoundError:
-        # Return empty dashboard with just the date display
-        return html.Div([
-            html.H3(f"No trading data available for {date_str}"),
-            html.Div([
-                html.H3("Trade Summary", style={'color': '#2c3e50'}),
-                html.P("Total PnL: $0.00", style={'fontSize': 18}),
-                html.P("Total Trades: 0")
-            ], style={'margin': '20px', 'padding': '15px', 'borderRadius': '5px', 'backgroundColor': '#f8f9fa'})
-        ]), note
+        try:
+            # Try to load trades data
+
+            ymd = date_str.split('-')
+            newDate = ymd[1] + '-' + ymd[2] + '-' +ymd[0]
+            file_path = os.path.join(DATA_DIR, f'{newDate}.csv')
+            df = pd.read_csv(file_path)
+
+
+
+            trades_df = calculate_trades_csv(df)
+            return create_dashboard(trades_df), note
+        except FileNotFoundError:
+            # Return empty dashboard with just the date display
+            return html.Div([
+                html.H3(f"No trading data available for {date_str}"),
+                html.Div([
+                    html.H3("Trade Summary", style={'color': '#2c3e50'}),
+                    html.P("Total PnL: $0.00", style={'fontSize': 18}),
+                    html.P("Total Trades: 0")
+                ], style={'margin': '20px', 'padding': '15px', 'borderRadius': '5px', 'backgroundColor': '#f8f9fa'})
+            ]), note
 
 
 def load_notes(date_str):
