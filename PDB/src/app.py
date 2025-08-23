@@ -25,8 +25,10 @@ class TradingDashboard:
         self._setup_callbacks()
     
     def _setup_layout(self):
+
+        today = datetime.now().strftime('%Y-%m-%d') # Get today's date as string
         self.app.layout = html.Div([
-            dcc.Store(id='current-date', data='2025-02-05'),
+            dcc.Store(id='current-date', data=today),
             dcc.Tabs([
                 dcc.Tab(label='Daily View', children=[
                     html.Div([
@@ -100,10 +102,24 @@ class TradingDashboard:
              Output('notes-input', 'value')],
             [Input('current-date', 'data')]
         )
+
+
+
+        #This is the rithmic version
         def update_dashboard(date_str):
-            file_path = os.path.join(DATA_DIR, f'trades_{date_str}.xlsx')
+            file_path = os.path.join(DATA_DIR, f'{date_str}.csv')
             try:
-                df = pd.read_excel(file_path, sheet_name='tt-export', header=None)
+                df = pd.read_csv(file_path,  header=None)
+                trades_df = self.trade_processor.calculate_trades_csv_rithmic(df)
+                note = self.note_manager.load_notes(date_str)
+                return DashboardComponents.create_dashboard(trades_df), note
+            except FileNotFoundError:
+                return html.H3("No data available for this date"), ''
+        '''
+        def update_dashboard(date_str):
+            file_path = os.path.join(DATA_DIR, f'{date_str}.csv')
+            try:
+                df = pd.read_excel(file_path,  header=None)
                 df.columns = ["date", "time", "exchange", "contract", "B/S", "Size", "Price", "F", "Direct"]
                 processed_df = self.trade_processor.process_raw_data(df)
                 trades_df = self.trade_processor.calculate_trades(processed_df)
@@ -111,6 +127,9 @@ class TradingDashboard:
                 return DashboardComponents.create_dashboard(trades_df), note
             except FileNotFoundError:
                 return html.H3("No data available for this date"), ''
+                
+                
+        '''
 
         @self.app.callback(
             Output('notes-input', 'value', allow_duplicate=True),
