@@ -109,8 +109,19 @@ class TradingDashboard:
         def update_dashboard(date_str):
             file_path = os.path.join(DATA_DIR, f'{date_str}.csv')
             try:
-                df = pd.read_csv(file_path,  header=None)
-                trades_df = self.trade_processor.calculate_trades_csv_rithmic(df)
+                # Pass the file path directly instead of reading with pandas first
+                trades_df = self.trade_processor.calculate_trades_csv_rithmic(file_path)
+
+                # Keep your debug code
+                print(f"DEBUG: trades_df shape: {trades_df.shape}")
+                print(f"DEBUG: trades_df columns: {list(trades_df.columns)}")
+                print(f"DEBUG: trades_df empty: {trades_df.empty}")
+                if not trades_df.empty:
+                    print(f"DEBUG: First few rows:")
+                    print(trades_df.head())
+                else:
+                    print("DEBUG: DataFrame is empty!")
+
                 note = self.note_manager.load_notes(date_str)
                 return DashboardComponents.create_dashboard(trades_df), note
             except FileNotFoundError:
