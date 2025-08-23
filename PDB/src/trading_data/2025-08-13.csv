@@ -1,0 +1,16 @@
+"Account","Trade P&L","Commission & Fees","Net P&L","Trade Count","Winning Trades","Losing Trades","Win %","Lose %","Scratched Trades","Scratched %","Ticks Made","Max Drawdown","Max Drawdown %"
+"188076","-340.00","92.00","-432.00","6","3","3","50.00","50.00","0","0.00","0","",""
+"CLU5","-100.00","20.00","-120.00","1","0","1","0.00","100.00","0","0.00","0","",""
+"Trade Date","Entry Order Number","Entry Buy/Sell","Entry Time","Entry Price","Exit Order Number","Exit Buy/Sell","Exit Time","Exit Price","Trade Life Span (Seconds)","Fill Size","Trade P&L","Commission & Fees","Net P&L","Ticks Made"
+"20250813","93443283","S","2025-08-13 08:00:03","6315","93443307","B","2025-08-13 08:00:19","6317","16.750168","5","-100.00","20.00","-120.00",""
+"ESU5","-400.00","32.00","-432.00","1","0","1","0.00","100.00","0","0.00","0","",""
+"Trade Date","Entry Order Number","Entry Buy/Sell","Entry Time","Entry Price","Exit Order Number","Exit Buy/Sell","Exit Time","Exit Price","Trade Life Span (Seconds)","Fill Size","Trade P&L","Commission & Fees","Net P&L","Ticks Made"
+"20250813","93448506","S","2025-08-13 09:25:02","6484.75","93457668","B","2025-08-13 09:25:28","6485.75","25.774379","8","-400.00","32.00","-432.00",""
+"NQU5","160.00","40.00","120.00","4","3","1","75.00","25.00","0","0.00","0","",""
+"Trade Date","Entry Order Number","Entry Buy/Sell","Entry Time","Entry Price","Exit Order Number","Exit Buy/Sell","Exit Time","Exit Price","Trade Life Span (Seconds)","Fill Size","Trade P&L","Commission & Fees","Net P&L","Ticks Made"
+"20250813","93471802","B","2025-08-13 10:23:20","23947.25","93471872","S","2025-08-13 10:23:27","23947.00","7.000225","3","-15.00","12.00","-27.00",""
+"20250813","93471802","B","2025-08-13 10:23:20","23947.00","93471872","S","2025-08-13 10:23:27","23947.25","7.000215","4","20.00","16.00","4.00",""
+"20250813","93471802","B","2025-08-13 10:23:20","23947.00","93471803","S","2025-08-13 10:23:26","23949.50","5.424132","2","100.00","8.00","92.00",""
+"20250813","93471802","B","2025-08-13 10:23:20","23946.75","93471803","S","2025-08-13 10:23:26","23949.50","5.424200","1","55.00","4.00","51.00",""
+
+

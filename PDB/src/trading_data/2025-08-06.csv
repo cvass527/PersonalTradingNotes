@@ -1,0 +1,7 @@
+"Account","Trade P&L","Commission & Fees","Net P&L","Trade Count","Winning Trades","Losing Trades","Win %","Lose %","Scratched Trades","Scratched %","Ticks Made","Max Drawdown","Max Drawdown %"
+"188076","-187.50","20.00","-207.50","1","0","1","0.00","100.00","0","0.00","0","",""
+"ESU5","-187.50","20.00","-207.50","1","0","1","0.00","100.00","0","0.00","0","",""
+"Trade Date","Entry Order Number","Entry Buy/Sell","Entry Time","Entry Price","Exit Order Number","Exit Buy/Sell","Exit Time","Exit Price","Trade Life Span (Seconds)","Fill Size","Trade P&L","Commission & Fees","Net P&L","Ticks Made"
+"20250806","93200618","S","2025-08-06 14:59:00","6370.00","93200637","B","2025-08-06 14:59:08","6370.75","8.581399","5","-187.50","20.00","-207.50",""
+
+

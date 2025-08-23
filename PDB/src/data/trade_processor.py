@@ -74,6 +74,14 @@ class TradeProcessor:
             # Check if this is a contract name line
             if self._is_contract_line(fields[0]):
                 current_contract = fields[0]
+
+                if current_contract:
+                    print(f"DEBUG: Line after contract {current_contract}: {fields[:5]}")
+                    clean_fields = [field.strip('"') for field in fields]
+                    print(f"DEBUG: Clean fields: {clean_fields[:5]}")
+                    print(f"DEBUG: Has Trade Date? {'Trade Date' in clean_fields}")
+                    print(f"DEBUG: Has Entry Order Number? {'Entry Order Number' in clean_fields}")
+
                 contracts_data[current_contract] = {
                     'summary': self._parse_contract_summary(fields),
                     'trades': []
@@ -81,6 +89,7 @@ class TradeProcessor:
                 current_section = 'summary'
                 print(f"DEBUG: Set current_contract to {current_contract}, section = summary")
                 continue
+
 
             # Check if this is a trade header (handle quoted fields)
             clean_fields = [field.strip('"') for field in fields]
@@ -155,16 +164,12 @@ class TradeProcessor:
 
     def _parse_trade_line(self, fields: List[str]) -> Optional[Dict]:
         """Parse individual trade line."""
-        print(f"DEBUG: _parse_trade_line called with {len(fields)} fields")
-
         if len(fields) < 14:
-            print(f"DEBUG: Too few fields: {len(fields)}, need 14")
             return None
 
         try:
             # Clean quotes from fields
             clean_fields = [field.strip('"') for field in fields]
-            print(f"DEBUG: Clean fields sample: {clean_fields[:5]}")
 
             result = {
                 'trade_date': clean_fields[0],
@@ -183,13 +188,11 @@ class TradeProcessor:
                 'net_pnl': float(clean_fields[13])
             }
 
-            print(f"DEBUG: Successfully created trade data: {result['entry_order_number']}")
             return result
 
-        except (ValueError, IndexError) as e:
-            print(f"DEBUG: Error in _parse_trade_line: {e}")
-            print(f"DEBUG: Fields were: {fields[:5]}")
+        except (ValueError, IndexError) as e:  # <-- THIS LINE IS MISSING!
             return None
+
 
         except (ValueError, IndexError) as e:
             print(f"DEBUG: Error in _parse_trade_line: {e}")
