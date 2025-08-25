@@ -1,0 +1,756 @@
+/* Apple-Style Dark Mode Trading Dashboard */
+
+:root {
+  /* Apple Dark Theme Colors */
+  --bg-primary: #1c1c1e;
+  --bg-secondary: #2c2c2e;
+  --bg-tertiary: #3a3a3c;
+  --bg-elevated: #48484a;
+  
+  /* Text Colors */
+  --text-primary: #ffffff;
+  --text-secondary: #e5e5e7;
+  --text-tertiary: #a1a1a6;
+  --text-muted: #8e8e93;
+  
+  /* Accent Colors */
+  --accent-blue: #007aff;
+  --accent-green: #34c759;
+  --accent-red: #ff3b30;
+  --accent-orange: #ff9500;
+  --accent-purple: #af52de;
+  
+  /* Trading Specific Colors */
+  --profit-green: #30d158;
+  --loss-red: #ff453a;
+  --neutral-gray: #8e8e93;
+  
+  /* Blur Effects */
+  --blur-light: rgba(255, 255, 255, 0.1);
+  --blur-dark: rgba(0, 0, 0, 0.3);
+  
+  /* Shadows */
+  --shadow-small: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.4);
+  --shadow-large: 0 8px 32px rgba(0, 0, 0, 0.5);
+  
+  /* Border Radius */
+  --radius-small: 8px;
+  --radius-medium: 12px;
+  --radius-large: 16px;
+  --radius-xl: 20px;
+}
+
+/* Base Styling */
+body {
+  background: linear-gradient(135deg, var(--bg-primary) 0%, #0a0a0a 100%);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+/* Main Container */
+#react-entry-point > div {
+  background: var(--bg-primary);
+  min-height: 100vh;
+  padding: 20px;
+}
+
+/* Tab Styling - Apple Style */
+.dash-tab {
+  background: var(--bg-secondary) !important;
+  border: none !important;
+  border-radius: var(--radius-medium) var(--radius-medium) 0 0 !important;
+  color: var(--text-primary) !important;
+  padding: 16px 24px !important;
+  margin: 0 4px !important;
+  font-weight: 500 !important;
+  font-size: 15px !important;
+  transition: all 0.3s ease !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.dash-tab:hover {
+  background: var(--bg-tertiary) !important;
+  color: var(--text-primary) !important;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-small);
+}
+
+.dash-tab--selected {
+  background: var(--accent-blue) !important;
+  color: white !important;
+  box-shadow: var(--shadow-medium);
+  transform: translateY(-2px);
+}
+
+.dash-tabs-container {
+  background: var(--bg-primary) !important;
+  margin-bottom: 24px;
+  padding: 8px;
+  border-radius: var(--radius-large);
+  border: 1px solid var(--border-color);
+}
+
+/* Additional tab styling to ensure dark theme */
+.dash-tab, [data-dash-entry-id] .dash-tab {
+  background: var(--bg-secondary) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+.dash-tab:hover, [data-dash-entry-id] .dash-tab:hover {
+  background: var(--bg-tertiary) !important;
+  color: var(--text-primary) !important;
+}
+
+.dash-tab--selected, [data-dash-entry-id] .dash-tab--selected {
+  background: var(--accent-blue) !important;
+  color: white !important;
+}
+
+/* Force dark theme on tabs - comprehensive coverage */
+div[data-dash-is-loading] .dash-tab,
+#main-tabs .dash-tab,
+._dash-undo-redo .dash-tab {
+  background: var(--bg-secondary) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+div[data-dash-is-loading] .dash-tab--selected,
+#main-tabs .dash-tab--selected,
+._dash-undo-redo .dash-tab--selected {
+  background: var(--accent-blue) !important;
+  color: white !important;
+}
+
+/* Tab wrapper and container styling - comprehensive */
+div[data-dash-is-loading] .dash-tabs-wrapper,
+#main-tabs .dash-tabs-wrapper,
+._dash-undo-redo .dash-tabs-wrapper,
+div[data-dash-is-loading] .dash-tabs-container,
+#main-tabs .dash-tabs-container,
+._dash-undo-redo .dash-tabs-container,
+.dash-tabs-container div,
+#main-tabs div {
+  background: var(--bg-primary) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--radius-large) !important;
+  padding: 8px !important;
+}
+
+/* Nuclear option - force all tab-related elements to have dark background */
+[id*="tabs"],
+[class*="tab"] {
+  background: var(--bg-primary) !important;
+}
+
+/* Specific targeting for the main tabs */
+#main-tabs,
+#main-tabs > div,
+#main-tabs .dash-tabs-wrapper,
+#main-tabs .dash-tabs-container {
+  background: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+}
+
+.dash-tabs-wrapper {
+  background: var(--bg-primary) !important;
+  border-radius: var(--radius-large);
+  padding: 0px;
+  box-shadow: var(--shadow-medium);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: none;
+}
+
+/* Card Components */
+.trading-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--bg-tertiary);
+  border-radius: var(--radius-large);
+  padding: 24px;
+  margin: 16px 0;
+  box-shadow: var(--shadow-medium);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  transition: all 0.3s ease;
+}
+
+.trading-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-large);
+  border-color: var(--bg-elevated);
+}
+
+/* Buttons - Apple Style */
+button, .dash-button {
+  background: var(--accent-blue) !important;
+  color: white !important;
+  border: none !important;
+  border-radius: var(--radius-medium) !important;
+  padding: 12px 20px !important;
+  font-weight: 500 !important;
+  font-size: 15px !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  box-shadow: var(--shadow-small);
+}
+
+button:hover, .dash-button:hover {
+  background: #0056cc !important;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-medium);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+/* Success/Profit Colors */
+.profit-button {
+  background: var(--profit-green) !important;
+}
+
+.profit-button:hover {
+  background: #28cd14 !important;
+}
+
+/* Danger/Loss Colors */
+.loss-button {
+  background: var(--loss-red) !important;
+}
+
+.loss-button:hover {
+  background: #e6342a !important;
+}
+
+/* Input Fields */
+input, textarea, .dash-input {
+  background: var(--bg-tertiary) !important;
+  border: 2px solid var(--bg-elevated) !important;
+  border-radius: var(--radius-medium) !important;
+  color: var(--text-primary) !important;
+  padding: 12px 16px !important;
+  font-size: 15px !important;
+  transition: all 0.3s ease !important;
+}
+
+input:focus, textarea:focus, .dash-input:focus {
+  border-color: var(--accent-blue) !important;
+  outline: none !important;
+  box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.2);
+}
+
+/* Dropdown Styling */
+.Select-control {
+  background: var(--bg-tertiary) !important;
+  border: 2px solid var(--bg-elevated) !important;
+  border-radius: var(--radius-medium) !important;
+  color: var(--text-primary) !important;
+}
+
+.Select-menu-outer {
+  background: var(--bg-tertiary) !important;
+  border: 1px solid var(--bg-elevated) !important;
+  border-radius: var(--radius-medium) !important;
+  box-shadow: var(--shadow-large);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.Select-option {
+  background: transparent !important;
+  color: var(--text-secondary) !important;
+}
+
+.Select-option:hover {
+  background: var(--accent-blue) !important;
+  color: white !important;
+}
+
+/* Tables */
+.dash-table-container .dash-spreadsheet-container .dash-spreadsheet-inner {
+  background: var(--bg-secondary) !important;
+  border-radius: var(--radius-large) !important;
+  overflow: hidden;
+}
+
+.dash-table-container .dash-spreadsheet-container .dash-spreadsheet-inner table {
+  background: transparent !important;
+}
+
+.dash-table-container .dash-spreadsheet-container .dash-spreadsheet-inner th {
+  background: var(--bg-tertiary) !important;
+  color: var(--text-primary) !important;
+  border: none !important;
+  padding: 16px !important;
+  font-weight: 600 !important;
+}
+
+.dash-table-container .dash-spreadsheet-container .dash-spreadsheet-inner td {
+  background: var(--bg-secondary) !important;
+  color: var(--text-secondary) !important;
+  border: none !important;
+  border-bottom: 1px solid var(--bg-tertiary) !important;
+  padding: 14px 16px !important;
+}
+
+/* Statistics Cards */
+.stats-card {
+  background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+  border: 1px solid var(--bg-elevated);
+  border-radius: var(--radius-large);
+  padding: 20px;
+  text-align: center;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.stats-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-large);
+}
+
+.stats-value {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 8px 0;
+}
+
+.stats-value.profit {
+  color: var(--profit-green);
+}
+
+.stats-value.loss {
+  color: var(--loss-red);
+}
+
+.stats-value.neutral {
+  color: var(--accent-blue);
+}
+
+.stats-label {
+  color: var(--text-tertiary);
+  font-size: 14px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Trade Cards */
+.trade-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--bg-tertiary);
+  border-radius: var(--radius-large);
+  padding: 24px;
+  margin: 16px 0;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.trade-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-medium);
+  border-color: var(--bg-elevated);
+}
+
+/* P&L Indicators */
+.pnl-positive {
+  color: var(--profit-green) !important;
+  font-weight: 600;
+}
+
+.pnl-negative {
+  color: var(--loss-red) !important;
+  font-weight: 600;
+}
+
+.pnl-neutral {
+  color: var(--neutral-gray) !important;
+}
+
+/* Direction Indicators */
+.direction-long {
+  color: var(--profit-green) !important;
+  font-weight: 600;
+}
+
+.direction-short {
+  color: var(--loss-red) !important;
+  font-weight: 600;
+}
+
+/* Headers */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text-primary);
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+h1 { font-size: 32px; }
+h2 { font-size: 28px; }
+h3 { font-size: 24px; }
+h4 { font-size: 20px; }
+h5 { font-size: 18px; }
+h6 { font-size: 16px; }
+
+/* Loading States */
+.loading-spinner {
+  color: var(--accent-blue);
+  text-align: center;
+  padding: 40px;
+  font-size: 16px;
+}
+
+/* Calendar Specific Styles */
+.calendar-container {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-large);
+  padding: 24px;
+  box-shadow: var(--shadow-medium);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.calendar-day {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--bg-elevated);
+  border-radius: var(--radius-small);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.calendar-day:hover {
+  transform: scale(1.05);
+  box-shadow: var(--shadow-small);
+}
+
+.calendar-day.profit {
+  background: linear-gradient(135deg, var(--profit-green), #28cd14);
+  color: white;
+}
+
+.calendar-day.loss {
+  background: linear-gradient(135deg, var(--loss-red), #e6342a);
+  color: white;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+  border-radius: var(--radius-small);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--bg-elevated);
+  border-radius: var(--radius-small);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* Navigation Controls */
+.nav-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin: 20px 0;
+  padding: 16px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-large);
+  box-shadow: var(--shadow-small);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* Glass Effect for Premium Elements */
+.glass-effect {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: var(--shadow-medium);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+.fade-in {
+  animation: fadeIn 0.6s ease-out;
+}
+
+.slide-in {
+  animation: slideIn 0.4s ease-out;
+}
+
+/* Modern Form Styling */
+.modern-input {
+  background: var(--bg-tertiary) !important;
+  border: 2px solid var(--bg-elevated) !important;
+  border-radius: var(--radius-medium) !important;
+  color: var(--text-primary) !important;
+  padding: 14px 18px !important;
+  font-size: 15px !important;
+  transition: all 0.3s ease !important;
+  font-weight: 500;
+}
+
+.modern-input:focus {
+  border-color: var(--accent-blue) !important;
+  outline: none !important;
+  box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.2) !important;
+  transform: translateY(-1px);
+}
+
+.modern-textarea {
+  background: var(--bg-tertiary) !important;
+  border: 2px solid var(--bg-elevated) !important;
+  border-radius: var(--radius-medium) !important;
+  color: var(--text-primary) !important;
+  padding: 16px !important;
+  font-size: 15px !important;
+  line-height: 1.5 !important;
+  transition: all 0.3s ease !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif !important;
+  resize: vertical !important;
+}
+
+.modern-textarea:focus {
+  border-color: var(--accent-blue) !important;
+  outline: none !important;
+  box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.2) !important;
+  transform: translateY(-1px);
+}
+
+.modern-dropdown .Select-control {
+  background: var(--bg-tertiary) !important;
+  border: 2px solid var(--bg-elevated) !important;
+  border-radius: var(--radius-medium) !important;
+  min-height: 50px !important;
+}
+
+.modern-dropdown .Select-control:focus {
+  border-color: var(--accent-blue) !important;
+  box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.2) !important;
+}
+
+/* Enhanced Trade Card Colors */
+.trade-card.fantastic {
+  background: linear-gradient(135deg, rgba(48, 209, 88, 0.1), rgba(48, 209, 88, 0.05));
+  border-left-color: var(--profit-green) !important;
+}
+
+.trade-card.good {
+  background: linear-gradient(135deg, rgba(48, 209, 88, 0.08), rgba(48, 209, 88, 0.03));
+  border-left-color: var(--profit-green) !important;
+}
+
+.trade-card.attention {
+  background: linear-gradient(135deg, rgba(255, 204, 2, 0.1), rgba(255, 204, 2, 0.05));
+  border-left-color: #ffcc02 !important;
+}
+
+.trade-card.uncertain {
+  background: linear-gradient(135deg, rgba(255, 149, 0, 0.1), rgba(255, 149, 0, 0.05));
+  border-left-color: var(--accent-orange) !important;
+}
+
+.trade-card.bad {
+  background: linear-gradient(135deg, rgba(255, 69, 58, 0.1), rgba(255, 69, 58, 0.05));
+  border-left-color: var(--loss-red) !important;
+}
+
+/* Enhanced Hover Effects */
+.trading-card:hover,
+.stats-card:hover,
+.trade-card:hover {
+  transform: translateY(-6px) !important;
+  box-shadow: var(--shadow-large) !important;
+}
+
+/* Modern Table Enhancements */
+.modern-table .dash-spreadsheet-container .dash-spreadsheet-inner table {
+  border-radius: var(--radius-large) !important;
+  overflow: hidden;
+}
+
+.modern-table .dash-spreadsheet-container .dash-spreadsheet-inner th {
+  background: linear-gradient(135deg, var(--bg-tertiary), var(--bg-elevated)) !important;
+  font-size: 14px !important;
+  letter-spacing: 0.5px !important;
+  text-transform: uppercase;
+}
+
+/* Special Effect for Premium Cards */
+.premium-glow {
+  box-shadow: 0 0 20px rgba(0, 122, 255, 0.3), var(--shadow-large) !important;
+  border: 1px solid rgba(0, 122, 255, 0.4) !important;
+}
+
+/* Loading Animation Enhancement */
+.loading-spinner {
+  position: relative;
+  padding: 60px 20px;
+}
+
+.loading-spinner::after {
+  content: '';
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin-left: -10px;
+  border: 2px solid var(--bg-elevated);
+  border-top: 2px solid var(--accent-blue);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Pulse Animation for Important Elements */
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.pulse {
+  animation: pulse 2s infinite;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  #react-entry-point > div {
+    padding: 12px;
+  }
+  
+  .trading-card {
+    padding: 16px;
+    margin: 12px 0;
+  }
+  
+  .stats-value {
+    font-size: 24px;
+  }
+  
+  .nav-controls {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .stats-card {
+    margin: 8px 0;
+  }
+}
+
+/* Chart and Graph Styling */
+.js-plotly-plot .plotly {
+  background: transparent !important;
+}
+
+.js-plotly-plot .plotly .modebar {
+  background: rgba(0, 0, 0, 0.3) !important;
+  border-radius: var(--radius-small) !important;
+}
+
+.js-plotly-plot .plotly .modebar-btn {
+  color: var(--text-secondary) !important;
+}
+
+.js-plotly-plot .plotly .modebar-btn:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Ensure all text in cards is readable */
+.trading-card, .stats-card, .trade-card {
+  color: var(--text-primary) !important;
+}
+
+.trading-card h1, .trading-card h2, .trading-card h3, .trading-card h4, .trading-card h5, .trading-card h6,
+.stats-card h1, .stats-card h2, .stats-card h3, .stats-card h4, .stats-card h5, .stats-card h6,
+.trade-card h1, .trade-card h2, .trade-card h3, .trade-card h4, .trade-card h5, .trade-card h6 {
+  color: var(--text-primary) !important;
+}
+
+.trading-card p, .trading-card span, .trading-card div,
+.stats-card p, .stats-card span, .stats-card div,
+.trade-card p, .trade-card span, .trade-card div {
+  color: inherit !important;
+}
+
+/* Force white text on any remaining white backgrounds */
+div[style*="background-color: #ffffff"], 
+div[style*="background-color: white"], 
+div[style*="backgroundColor: #ffffff"],
+div[style*="backgroundColor: white"] {
+  background-color: var(--bg-secondary) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Fix any remaining light backgrounds */
+.dash-graph {
+  background: transparent !important;
+}
+
+.dash-graph > div {
+  background: transparent !important;
+}
+
+/* Ensure dropdowns work with dark theme */
+.Select-menu-outer {
+  background: var(--bg-tertiary) !important;
+  border: 1px solid var(--bg-elevated) !important;
+  color: var(--text-primary) !important;
+}
+
+.Select-option {
+  background: transparent !important;
+  color: var(--text-primary) !important;
+}
+
+.Select-option:hover {
+  background: var(--accent-blue) !important;
+  color: white !important;
+}
+
+.Select-value-label {
+  color: var(--text-primary) !important;
+}
+
+.Select-placeholder {
+  color: var(--text-tertiary) !important;
+}
+
+/* Dark scrollbar for webkit browsers */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--bg-elevated) var(--bg-primary);
+}
