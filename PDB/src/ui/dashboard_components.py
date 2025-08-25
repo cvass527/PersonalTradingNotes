@@ -49,16 +49,45 @@ class DashboardComponents:
         if trades_df.empty or 'pnl' not in trades_df.columns:
             return dcc.Graph(figure={})
 
+        fig = px.bar(
+            trades_df,
+            x='contract',
+            y='pnl',
+            color='direction' if 'direction' in trades_df.columns else None,
+            barmode='group',
+            title='📊 P&L by Contract and Direction',
+            labels={'pnl': 'Profit/Loss ($)', 'contract': 'Contract', 'direction': 'Direction'},
+            color_discrete_map={'Long': '#34c759', 'Short': '#ff453a'}
+        )
+        
+        # Apply dark theme styling
+        fig.update_layout(
+            paper_bgcolor='#2c2c2e',
+            plot_bgcolor='#3a3a3c',
+            font=dict(color='#ffffff', family='SF Pro Display, -apple-system, sans-serif', size=14),
+            title=dict(font=dict(size=18, color='#ffffff'), x=0.5),
+            xaxis=dict(
+                gridcolor='#48484a',
+                zerolinecolor='#48484a',
+                tickfont=dict(color='#ffffff')
+            ),
+            yaxis=dict(
+                gridcolor='#48484a', 
+                zerolinecolor='#48484a',
+                tickfont=dict(color='#ffffff')
+            ),
+            legend=dict(
+                font=dict(color='#ffffff'),
+                bgcolor='rgba(0,0,0,0.3)',
+                bordercolor='rgba(255,255,255,0.2)',
+                borderwidth=1
+            ),
+            margin=dict(t=60, b=60, l=60, r=60)
+        )
+        
         return dcc.Graph(
-            figure=px.bar(
-                trades_df,
-                x='contract',
-                y='pnl',
-                color='direction' if 'direction' in trades_df.columns else None,
-                barmode='group',
-                title='PnL by Contract and Direction',
-                labels={'pnl': 'Profit/Loss ($)'}
-            )
+            figure=fig,
+            style={'backgroundColor': 'transparent'}
         )
 
     @staticmethod
@@ -66,48 +95,125 @@ class DashboardComponents:
         if trades_df.empty or 'pnl' not in trades_df.columns or 'exit_time' not in trades_df.columns:
             return dcc.Graph(figure={})
 
+        fig = px.scatter(
+            trades_df,
+            x='exit_time',  # Use datetime object, not formatted string
+            y='pnl',
+            color='contract' if 'contract' in trades_df.columns else None,
+            title='📈 Trade Performance Timeline',
+            labels={'pnl': 'Profit/Loss ($)', 'exit_time': 'Exit Time'},
+            size_max=15
+        )
+        
+        # Apply dark theme styling
+        fig.update_layout(
+            paper_bgcolor='#2c2c2e',
+            plot_bgcolor='#3a3a3c',
+            font=dict(color='#ffffff', family='SF Pro Display, -apple-system, sans-serif', size=14),
+            title=dict(font=dict(size=18, color='#ffffff'), x=0.5),
+            xaxis=dict(
+                gridcolor='#48484a',
+                zerolinecolor='#48484a',
+                tickfont=dict(color='#ffffff')
+            ),
+            yaxis=dict(
+                gridcolor='#48484a', 
+                zerolinecolor='#48484a',
+                tickfont=dict(color='#ffffff')
+            ),
+            legend=dict(
+                font=dict(color='#ffffff'),
+                bgcolor='rgba(0,0,0,0.3)',
+                bordercolor='rgba(255,255,255,0.2)',
+                borderwidth=1
+            ),
+            margin=dict(t=60, b=60, l=60, r=60)
+        )
+        
+        # Update traces for better visibility
+        fig.update_traces(
+            marker=dict(size=8, line=dict(width=2, color='rgba(255,255,255,0.3)'))
+        )
+        
         return dcc.Graph(
-            figure=px.scatter(
-                trades_df,
-                x='exit_time',  # Use datetime object, not formatted string
-                y='pnl',
-                color='contract' if 'contract' in trades_df.columns else None,
-                title='Trade Performance Timeline',
-                labels={'pnl': 'Profit/Loss ($)', 'exit_time': 'Exit Time'}
-            )
+            figure=fig,
+            style={'backgroundColor': 'transparent'}
         )
 
     @staticmethod
     def _create_summary_section(trades_df):
         if trades_df.empty or 'pnl' not in trades_df.columns:
             return html.Div([
-                html.H3("Trade Summary", style={'color': '#2c3e50'}),
-                html.P("No trades found for this date", style={'fontSize': 18, 'color': '#7f8c8d'})
-            ], style={'margin': '20px', 'padding': '15px', 'borderRadius': '5px', 'backgroundColor': '#f8f9fa'})
+                html.H3("📊 Trade Summary", className='fade-in'),
+                html.P("No trades found for this date", 
+                      style={'fontSize': '16px', 'color': 'var(--text-tertiary)'})
+            ], className='trading-card')
 
-        # Build summary with safe column access
-        summary_items = [
-            html.H3("Trade Summary", style={'color': '#2c3e50'}),
-            html.P(f"Total PnL: ${trades_df['pnl'].sum():.2f}", style={'fontSize': 18})
+        total_pnl = trades_df['pnl'].sum()
+        winning_trades = len(trades_df[trades_df['pnl'] > 0]) if 'pnl' in trades_df.columns else 0
+        losing_trades = len(trades_df[trades_df['pnl'] < 0]) if 'pnl' in trades_df.columns else 0
+        win_rate = (winning_trades / len(trades_df) * 100) if len(trades_df) > 0 else 0
+        
+        # Create modern stats cards
+        stats_cards = [
+            html.Div([
+                html.Div([
+                    html.Div("Total P&L", className='stats-label'),
+                    html.Div(f"${total_pnl:.2f}", 
+                            className=f'stats-value {"profit" if total_pnl >= 0 else "loss"}')
+                ], className='stats-card')
+            ], className='col-md-3'),
+            
+            html.Div([
+                html.Div([
+                    html.Div("Total Trades", className='stats-label'),
+                    html.Div(f"{len(trades_df)}", className='stats-value neutral')
+                ], className='stats-card')
+            ], className='col-md-3'),
+            
+            html.Div([
+                html.Div([
+                    html.Div("Win Rate", className='stats-label'),
+                    html.Div(f"{win_rate:.1f}%", 
+                            className=f'stats-value {"profit" if win_rate >= 50 else "loss"}')
+                ], className='stats-card')
+            ], className='col-md-3'),
+            
+            html.Div([
+                html.Div([
+                    html.Div("W/L Ratio", className='stats-label'),
+                    html.Div(f"{winning_trades}/{losing_trades}", className='stats-value neutral')
+                ], className='stats-card')
+            ], className='col-md-3')
         ]
 
-        # Add per-contract summaries if contract column exists
+        # Add per-contract breakdown if available
+        contract_breakdown = []
         if 'contract' in trades_df.columns:
             try:
                 for contract in trades_df['contract'].str.split().str[0].unique():
-                    contract_pnl = trades_df[trades_df['contract'].str.startswith(contract)]['pnl'].sum()
-                    summary_items.append(
-                        html.P(f"{contract} Total: ${contract_pnl:.2f}")
+                    contract_trades = trades_df[trades_df['contract'].str.startswith(contract)]
+                    contract_pnl = contract_trades['pnl'].sum()
+                    contract_breakdown.append(
+                        html.Div([
+                            html.Span(f"{contract}: ", 
+                                    style={'fontWeight': '500', 'color': 'var(--text-secondary)'}),
+                            html.Span(f"${contract_pnl:.2f}", 
+                                    className=f'{"pnl-positive" if contract_pnl >= 0 else "pnl-negative"}')
+                        ], style={'margin': '8px 0'})
                     )
             except Exception:
-                # If contract parsing fails, just show total
                 pass
 
-        summary_items.append(html.P(f"Total Trades: {len(trades_df)}"))
-
-        return html.Div(summary_items,
-                        style={'margin': '20px', 'padding': '15px', 'borderRadius': '5px',
-                               'backgroundColor': '#f8f9fa'})
+        return html.Div([
+            html.H3("📊 Daily Performance", className='fade-in', 
+                   style={'marginBottom': '24px'}),
+            html.Div(stats_cards, className='row fade-in'),
+            html.Div([
+                html.H5("📈 Contract Breakdown", style={'marginTop': '24px', 'marginBottom': '16px'}),
+                html.Div(contract_breakdown)
+            ] if contract_breakdown else [], className='fade-in', style={'marginTop': '20px'})
+        ], className='trading-card')
 
     @staticmethod
     def _create_trade_cards(trades_df, date_str=''):
@@ -150,132 +256,161 @@ class DashboardComponents:
             existing_note = trade_note_manager.get_trade_note(trade_id)
             existing_color = trade_note_manager.get_trade_color(trade_id)
             
-            # Define color scheme
+            # Define color scheme with better contrast
             color_options = [
-                {'label': 'No Rating', 'value': 'none'},
+                {'label': '⚪ No Rating', 'value': 'none'},
                 {'label': '🔴 Bad - Learn from this', 'value': 'bad'},
-                {'label': '🟠 Didn\'t work - Uncertain', 'value': 'uncertain'},
-                {'label': '🟡 Pay attention - Missed something', 'value': 'attention'},
-                {'label': '🟢 Good - Could do better', 'value': 'good'},
-                {'label': '💵 Fantastic - Keep doing this', 'value': 'fantastic'}
+                {'label': '🟠 Uncertain - Needs analysis', 'value': 'uncertain'},
+                {'label': '🟡 Attention - Could improve', 'value': 'attention'},
+                {'label': '🟢 Good - Solid execution', 'value': 'good'},
+                {'label': '💎 Fantastic - Perfect trade', 'value': 'fantastic'}
             ]
             
-            # Color mapping for backgrounds
-            color_backgrounds = {
-                'none': '#ffffff',
-                'bad': '#ffebee',        # Light red
-                'uncertain': '#fff3e0', # Light orange  
-                'attention': '#fffde7', # Light yellow
-                'good': '#e8f5e8',      # Light green
-                'fantastic': '#e0f2f1'  # Dollar bill green
+            # Enhanced color mapping with better backgrounds and text contrast
+            color_mapping = {
+                'none': {
+                    'background': 'var(--bg-secondary)',
+                    'border': 'var(--bg-elevated)',
+                    'text': 'var(--text-primary)'
+                },
+                'bad': {
+                    'background': 'rgba(255, 69, 58, 0.15)',
+                    'border': 'var(--loss-red)',
+                    'text': '#ff6b6b'
+                },
+                'uncertain': {
+                    'background': 'rgba(255, 149, 0, 0.15)',
+                    'border': 'var(--accent-orange)',
+                    'text': '#ff9500'
+                },
+                'attention': {
+                    'background': 'rgba(255, 204, 2, 0.15)',
+                    'border': '#ffcc02',
+                    'text': '#ffcc02'
+                },
+                'good': {
+                    'background': 'rgba(48, 209, 88, 0.15)',
+                    'border': 'var(--profit-green)',
+                    'text': '#34c759'
+                },
+                'fantastic': {
+                    'background': 'rgba(48, 209, 88, 0.25)',
+                    'border': 'var(--profit-green)',
+                    'text': '#30d158'
+                }
             }
             
-            # Create trade info grid
+            # Create modern trade info grid
+            pnl = row.get('pnl', 0)
+            direction = row.get('direction', 'N/A')
+            
+            # Get color scheme for text contrast
+            quality_colors = color_mapping.get(existing_color, color_mapping['none'])
+            
             trade_info = html.Div([
+                # Trade header with P&L prominence
                 html.Div([
                     html.Div([
-                        html.Strong("Contract: "),
-                        html.Span(str(row.get('contract', 'N/A')))
-                    ], className='col-md-2'),
+                        html.H6(f"📈 Trade #{idx + 1}", 
+                               style={'margin': '0', 'color': 'white', 'fontWeight': '600'}),
+                        html.Div(f"${pnl:.2f}", 
+                                style={'fontSize': '28px', 'fontWeight': '700', 'margin': '4px 0',
+                                      'color': '#ffffff' if pnl >= 0 else '#ff6b6b'})
+                    ], className='col-md-6'),
                     html.Div([
-                        html.Strong("Direction: "),
-                        html.Span(str(row.get('direction', 'N/A')), 
-                                style={'color': 'green' if row.get('direction') == 'Long' else 'red'})
-                    ], className='col-md-1'),
+                        html.Div([
+                            html.Span("📋 ", style={'fontSize': '16px'}),
+                            html.Span(str(row.get('contract', 'N/A')), 
+                                    style={'fontWeight': '600', 'color': '#ffffff', 'fontSize': '18px'})
+                        ], style={'marginBottom': '8px'}),
+                        html.Div([
+                            html.Span("📊 ", style={'fontSize': '16px'}),
+                            html.Span(f"{direction} • {int(row.get('quantity', 0))} lots",
+                                    style={'fontWeight': '600', 'color': '#ffffff', 'fontSize': '16px'})
+                        ])
+                    ], className='col-md-6', style={'textAlign': 'right'})
+                ], className='row', style={'marginBottom': '16px'}),
+                
+                # Trade details with better contrast
+                html.Div([
                     html.Div([
-                        html.Strong("Size: "),
-                        html.Span(f"{int(row.get('quantity', 0))} lots")
-                    ], className='col-md-1'),
+                        html.Div("🟢 Entry", style={'fontSize': '14px', 'color': '#ffffff', 'fontWeight': '700', 'marginBottom': '4px'}),
+                        html.Div(f"{row.get('entry_time', 'N/A')}", 
+                                style={'fontSize': '14px', 'color': 'rgba(255,255,255,0.8)'}),
+                        html.Div(f"${row.get('entry_price', 0):.2f}", 
+                                style={'fontSize': '18px', 'fontWeight': '600', 'color': '#ffffff'})
+                    ], className='col-md-6'),
                     html.Div([
-                        html.Strong("Entry: "),
-                        html.Span(f"{row.get('entry_time', 'N/A')} @ ${row.get('entry_price', 0):.2f}")
-                    ], className='col-md-3'),
-                    html.Div([
-                        html.Strong("Exit: "),
-                        html.Span(f"{row.get('exit_time', 'N/A')} @ ${row.get('exit_price', 0):.2f}")
-                    ], className='col-md-3'),
-                    html.Div([
-                        html.Strong("P&L: "),
-                        html.Span(f"${row.get('pnl', 0):.2f}", 
-                                style={'color': 'green' if row.get('pnl', 0) >= 0 else 'red', 'fontWeight': 'bold'})
-                    ], className='col-md-2')
-                ], className='row', style={'marginBottom': '10px'})
+                        html.Div("🔴 Exit", style={'fontSize': '14px', 'color': '#ffffff', 'fontWeight': '700', 'marginBottom': '4px'}),
+                        html.Div(f"{row.get('exit_time', 'N/A')}", 
+                                style={'fontSize': '14px', 'color': 'rgba(255,255,255,0.8)'}),
+                        html.Div(f"${row.get('exit_price', 0):.2f}", 
+                                style={'fontSize': '18px', 'fontWeight': '600', 'color': '#ffffff'})
+                    ], className='col-md-6')
+                ], className='row')
             ])
             
-            # Create notes section
+            # Create simplified notes section without individual save button
             notes_section = html.Div([
+                html.Hr(style={'margin': '20px 0', 'border': '1px solid rgba(255,255,255,0.2)'}),
+                
                 html.Div([
-                    html.Div([
-                        html.Label("Trade Quality:", style={'fontWeight': 'bold', 'marginBottom': '5px'}),
-                        dcc.Dropdown(
-                            id={'type': 'trade-color', 'index': idx},
-                            options=color_options,
-                            value=existing_color,
-                            placeholder="Select trade quality...",
-                            style={'marginBottom': '10px'}
-                        )
-                    ], className='col-md-4'),
-                    html.Div([
-                        html.Button(
-                            'Save All',
-                            id={'type': 'save-trade', 'index': idx},
-                            n_clicks=0,
-                            style={
-                                'marginTop': '25px',
-                                'padding': '8px 16px',
-                                'backgroundColor': '#2c3e50',
-                                'color': 'white',
-                                'border': 'none',
-                                'borderRadius': '4px',
-                                'cursor': 'pointer'
-                            }
-                        )
-                    ], className='col-md-2'),
-                    html.Div([
-                        html.Div(id={'type': 'save-status', 'index': idx}, 
-                               style={'marginTop': '28px', 'color': 'green', 'fontWeight': 'bold'})
-                    ], className='col-md-6')
-                ], className='row'),
-                html.Label("Trade Notes:", style={'fontWeight': 'bold', 'marginBottom': '5px', 'marginTop': '10px'}),
+                    html.Label("⭐ Trade Quality:", 
+                             style={'fontWeight': '600', 'marginBottom': '8px', 
+                                   'color': '#ffffff', 'fontSize': '16px'}),
+                    dcc.Dropdown(
+                        id={'type': 'trade-color', 'index': idx},
+                        options=color_options,
+                        value=existing_color,
+                        placeholder="Rate this trade...",
+                        style={'backgroundColor': 'rgba(0,0,0,0.3)', 'color': '#ffffff', 'marginBottom': '16px'}
+                    )
+                ]),
+                
+                html.Label("📝 Trade Notes:", 
+                         style={'fontWeight': '600', 'marginBottom': '8px', 
+                               'color': '#ffffff', 'fontSize': '16px'}),
                 dcc.Textarea(
                     id={'type': 'trade-note', 'index': idx},
                     value=existing_note,
-                    placeholder="Enter your analysis, observations, and lessons learned for this trade...",
+                    placeholder="📊 What worked well? What could be improved? Key insights and lessons...",
                     style={
-                        'width': '100%',
-                        'height': '100px',
-                        'padding': '8px',
-                        'border': '1px solid #ddd',
-                        'borderRadius': '4px',
-                        'fontSize': '14px',
-                        'resize': 'vertical'
+                        'width': '100%', 'minHeight': '100px', 'resize': 'vertical',
+                        'backgroundColor': 'rgba(0,0,0,0.3)',
+                        'color': '#ffffff',
+                        'border': '2px solid rgba(255,255,255,0.2)',
+                        'borderRadius': '12px',
+                        'padding': '16px'
                     }
                 )
-            ])
+            ], style={'marginTop': '16px'})
             
-            # Create trade card with dynamic background color
-            card_background = color_backgrounds.get(existing_color, '#ffffff')
+            # Get color scheme for this trade quality
+            quality_colors = color_mapping.get(existing_color, color_mapping['none'])
+            
             trade_card = html.Div([
-                html.H6(f"Trade #{idx + 1}", style={'color': '#2c3e50', 'marginBottom': '10px'}),
                 trade_info,
-                html.Hr(style={'margin': '15px 0'}),
                 notes_section,
                 html.Div(trade_id, id={'type': 'trade-id', 'index': idx}, style={'display': 'none'})  # Hidden trade ID
             ], 
             id={'type': 'trade-card', 'index': idx},
+            className='trade-card fade-in',
             style={
-                'border': '1px solid #ddd',
-                'borderRadius': '8px',
-                'padding': '20px',
-                'marginBottom': '20px',
-                'backgroundColor': card_background,
-                'boxShadow': '0 2px 4px rgba(0,0,0,0.1)',
-                'transition': 'background-color 0.3s ease'
+                'background': quality_colors['background'],
+                'border': f'2px solid {quality_colors["border"]}',
+                'borderRadius': 'var(--radius-large)',
+                'padding': '24px',
+                'marginBottom': '24px',
+                'transition': 'all 0.3s ease',
+                'backdropFilter': 'blur(20px)',
+                'boxShadow': 'var(--shadow-medium)'
             })
             
             trade_cards.append(trade_card)
         
         return html.Div([
-            html.H4("Individual Trade Analysis", style={'color': '#2c3e50', 'marginBottom': '20px'}),
-            html.Div(trade_cards)
+            html.H3("🔍 Individual Trade Analysis", 
+                   className='fade-in',
+                   style={'marginBottom': '24px', 'color': 'var(--text-primary)'}),
+            html.Div(trade_cards, className='slide-in')
         ])

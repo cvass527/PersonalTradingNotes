@@ -19,43 +19,82 @@ class MonthlyFallback:
         
         return html.Div([
             html.H2(f"📅 {calendar.month_name[month]} {year} Trading Summary", 
-                   style={'color': '#2c3e50', 'textAlign': 'center', 'marginBottom': '30px'}),
+                   className='fade-in',
+                   style={'textAlign': 'center', 'marginBottom': '32px', 'color': 'var(--text-primary)'}),
             
-            # Statistics section
+            # Modern statistics section
             html.Div([
-                html.H3("📊 Statistics", style={'color': '#34495e'}),
-                html.P(f"Trading Days: {len(monthly_data)}", style={'fontSize': '16px'}),
-                html.P(f"Files Found: {', '.join(list(monthly_data.keys())[:5])}{' ...' if len(monthly_data) > 5 else ''}", 
-                      style={'fontSize': '14px', 'color': '#6c757d'}),
-                html.P(f"Data Directory: {DATA_DIR}", style={'fontSize': '12px', 'color': '#6c757d'})
-            ], style={'backgroundColor': '#f8f9fa', 'padding': '20px', 'borderRadius': '8px', 'margin': '20px 0'}),
+                html.H3("📊 Statistics", style={'marginBottom': '20px'}),
+                html.Div([
+                    html.Div([
+                        html.Div("Trading Days", className='stats-label'),
+                        html.Div(f"{len(monthly_data)}", className='stats-value neutral')
+                    ], className='stats-card col-md-4'),
+                    
+                    html.Div([
+                        html.Div("Files Found", className='stats-label'),
+                        html.Div(f"{len(monthly_data)}", className='stats-value profit')
+                    ], className='stats-card col-md-4'),
+                    
+                    html.Div([
+                        html.Div("Data Ready", className='stats-label'),
+                        html.Div("✅", className='stats-value', style={'fontSize': '32px'})
+                    ], className='stats-card col-md-4')
+                ], className='row'),
+                
+                html.P(f"📂 Found files: {', '.join(list(monthly_data.keys())[:3])}{'...' if len(monthly_data) > 3 else ''}", 
+                      style={'marginTop': '16px', 'color': 'var(--text-tertiary)', 'textAlign': 'center'}),
+            ], className='trading-card fade-in'),
             
-            # Calendar preview
+            # Calendar preview with modern styling
             html.Div([
-                html.H3("📈 Calendar View Preview", style={'color': '#34495e'}),
-                html.P("Your trading calendar would show:"),
-                html.Pre(self._create_text_calendar(monthly_data, year, month),
-                        style={'backgroundColor': '#ffffff', 'padding': '15px', 'border': '1px solid #ddd',
-                               'borderRadius': '4px', 'fontSize': '14px', 'fontFamily': 'monospace'})
-            ], style={'backgroundColor': '#e8f5e8', 'padding': '20px', 'borderRadius': '8px', 'margin': '20px 0'}),
+                html.H3("📈 Interactive Calendar Preview", style={'marginBottom': '20px'}),
+                html.P("Your full trading calendar will look like this:", 
+                      style={'color': 'var(--text-secondary)', 'marginBottom': '16px'}),
+                html.Div([
+                    html.Pre(self._create_text_calendar(monthly_data, year, month),
+                            style={'fontSize': '14px', 'fontFamily': 'SF Mono, Monaco, monospace',
+                                  'color': 'var(--accent-blue)', 'lineHeight': '1.6'})
+                ], className='calendar-container')
+            ], className='trading-card fade-in'),
             
-            # Instructions
+            # Modern upgrade instructions
             html.Div([
-                html.H3("🔧 To Enable Full Interactive Monthly View:", style={'color': '#34495e'}),
-                html.P("Install the required dependencies:"),
-                html.Code("pip install pandas plotly", 
-                         style={'backgroundColor': '#f1f1f1', 'padding': '8px', 'borderRadius': '4px',
-                                'display': 'block', 'margin': '10px 0'}),
-                html.P("Then restart your app and you'll get:"),
-                html.Ul([
-                    html.Li("📅 Interactive calendar with clickable days"),
-                    html.Li("📊 Real P&L calculations and statistics"),
-                    html.Li("📈 Performance charts and visualizations"),
-                    html.Li("🔄 Month navigation controls")
+                html.H3("🚀 Unlock Full Power", style={'marginBottom': '20px'}),
+                html.P("Install dependencies for the complete experience:", 
+                      style={'color': 'var(--text-secondary)', 'marginBottom': '16px'}),
+                
+                html.Div([
+                    html.Code("pip install pandas plotly", 
+                             style={'padding': '12px 16px', 'borderRadius': 'var(--radius-medium)',
+                                   'backgroundColor': 'var(--bg-tertiary)', 'color': 'var(--accent-blue)',
+                                   'fontFamily': 'SF Mono, Monaco, monospace', 'fontSize': '14px',
+                                   'display': 'block', 'textAlign': 'center', 'fontWeight': '600'})
+                ], style={'marginBottom': '20px'}),
+                
+                html.P("Then restart your app to unlock:", style={'marginBottom': '12px'}),
+                html.Div([
+                    html.Div([
+                        html.Span("📅", style={'fontSize': '20px', 'marginRight': '8px'}),
+                        html.Span("Interactive calendar with clickable days")
+                    ], style={'margin': '8px 0', 'color': 'var(--text-secondary)'}),
+                    html.Div([
+                        html.Span("📊", style={'fontSize': '20px', 'marginRight': '8px'}),
+                        html.Span("Real P&L calculations and win rates")
+                    ], style={'margin': '8px 0', 'color': 'var(--text-secondary)'}),
+                    html.Div([
+                        html.Span("📈", style={'fontSize': '20px', 'marginRight': '8px'}),
+                        html.Span("Beautiful performance charts and visualizations")
+                    ], style={'margin': '8px 0', 'color': 'var(--text-secondary)'}),
+                    html.Div([
+                        html.Span("🔄", style={'fontSize': '20px', 'marginRight': '8px'}),
+                        html.Span("Smooth month navigation and animations")
+                    ], style={'margin': '8px 0', 'color': 'var(--text-secondary)'})
                 ])
-            ], style={'backgroundColor': '#fff3e0', 'padding': '20px', 'borderRadius': '8px', 'margin': '20px 0'})
+            ], className='trading-card glass-effect fade-in',
+               style={'border': '2px solid var(--accent-blue)', 'marginTop': '24px'})
             
-        ], style={'padding': '20px', 'fontFamily': 'Arial, sans-serif'})
+        ], className='slide-in')
     
     def _get_monthly_data_simple(self, year, month):
         """Simple version without pandas/processing"""

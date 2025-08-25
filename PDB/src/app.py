@@ -45,53 +45,155 @@ class TradingDashboard:
             dcc.Store(id='current-date', data=today),
             dcc.Store(id='current-year', data=datetime.now().year),
             dcc.Store(id='current-month', data=datetime.now().month),
-            dcc.Tabs(id='main-tabs', value='daily-tab', children=[
-                dcc.Tab(label='Daily View', value='daily-tab', children=[
+            dcc.Tabs(id='main-tabs', value='daily-tab', style={
+                'backgroundColor': 'var(--bg-primary)',
+                'borderRadius': 'var(--radius-large)',
+                'padding': '8px',
+                'border': '1px solid var(--border-color)'
+            }, children=[
+                dcc.Tab(label='📊 Daily View', value='daily-tab', style={
+                    'backgroundColor': 'var(--bg-secondary)',
+                    'color': 'var(--text-primary)',
+                    'border': '1px solid var(--border-color)'
+                }, children=[
+                    # Modern navigation header
                     html.Div([
-                        html.Button('Previous Day', id='prev-day', n_clicks=0),
-                        html.Button('Next Day', id='next-day', n_clicks=0),
-                        html.Div(id='date-display', style={'display': 'inline-block', 'margin': '0 20px'})
-                    ]),
-                    html.Div(id='dashboard-content'),
+                        html.Button('‹', id='prev-day', n_clicks=0,
+                                  style={'fontSize': '24px', 'width': '50px', 'height': '50px'}),
+                        html.Div(id='date-display', 
+                               style={'display': 'inline-block', 'margin': '0 24px', 
+                                     'fontSize': '20px', 'fontWeight': '600',
+                                     'color': 'var(--text-primary)'}),
+                        html.Button('›', id='next-day', n_clicks=0,
+                                  style={'fontSize': '24px', 'width': '50px', 'height': '50px'})
+                    ], className='nav-controls'),
+                    
+                    # Dashboard content 
+                    html.Div(id='dashboard-content', className='fade-in'),
+                    
+                    # Daily notes section (moved back to main layout for callback access)
                     html.Div([
-                        html.H3("Daily Notes"),
-                        dcc.Textarea(id='notes-input', style={'width': '100%', 'height': 100}),
-                        html.Button('Save Note', id='save-note', n_clicks=0)
-                    ])
-                ]),
-                dcc.Tab(label='Monthly Summary', value='monthly-tab', children=[
-                    html.Div(id='monthly-content', children=[
-                        html.Div("Loading monthly summary...", style={'padding': '20px', 'textAlign': 'center'})
-                    ])
-                ]),
-                dcc.Tab(label='Contract Manager', value='contracts-tab', children=[
-                    html.Div([
-                        html.H3("Manage Contracts"),
+                        html.H3("📝 Daily Reflection", 
+                               className='fade-in',
+                               style={'marginBottom': '16px', 'color': 'var(--text-primary)'}),
+                        html.P("Capture your overall thoughts about today's trading session:",
+                              style={'color': 'var(--text-secondary)', 'marginBottom': '12px'}),
+                        dcc.Textarea(
+                            id='notes-input',
+                            placeholder="📊 How did today's trading go? Key insights, lessons learned, market observations...",
+                            style={'width': '100%', 'minHeight': '120px', 'marginBottom': '16px'}
+                        ),
                         html.Div([
-                            dcc.Input(id='contract-name', placeholder='Contract Name (e.g., ES)',
-                                      style={'margin': '5px'}),
-                            dcc.Input(id='tick-value', type='number', placeholder='Tick Value',
-                                      style={'margin': '5px'}),
-                            dcc.Input(id='tick-size', type='number', placeholder='Tick Size',
-                                      step=0.01, style={'margin': '5px'}),
-                            html.Button('Save Contract', id='save-contract', n_clicks=0,
-                                        style={'margin': '5px'})
-                        ]),
-                        html.Div(id='contract-status', style={'margin': '10px'}),
-                        html.H4("Saved Contracts"),
+                            html.Button('💾 Save Daily Notes', id='save-daily-note', n_clicks=0, 
+                                       className='profit-button',
+                                       style={'width': '48%', 'padding': '14px', 'marginRight': '4%'}),
+                            html.Button('💾 Save Trade Analysis', id='save-note', n_clicks=0, 
+                                       className='profit-button',
+                                       style={'width': '48%', 'padding': '14px'})
+                        ], style={'display': 'flex', 'width': '100%'})
+                    ], className='trading-card fade-in', style={'marginTop': '24px'})
+                ]),
+                dcc.Tab(label='📅 Monthly Summary', value='monthly-tab', style={
+                    'backgroundColor': 'var(--bg-secondary)',
+                    'color': 'var(--text-primary)',
+                    'border': '1px solid var(--border-color)'
+                }, children=[
+                    html.Div(id='monthly-content', children=[
+                        html.Div("🔄 Loading monthly summary...", 
+                               className='loading-spinner')
+                    ])
+                ]),
+                dcc.Tab(label='⚙️ Contract Manager', value='contracts-tab', style={
+                    'backgroundColor': 'var(--bg-secondary)',
+                    'color': 'var(--text-primary)',
+                    'border': '1px solid var(--border-color)'
+                }, children=[
+                    html.Div([
+                        html.H3("⚙️ Contract Configuration", 
+                               style={'marginBottom': '24px', 'color': 'var(--text-primary)'}),
+                        
+                        # Modern contract input form
+                        html.Div([
+                            html.Div([
+                                html.Label("📋 Contract Symbol", 
+                                         style={'fontWeight': '600', 'marginBottom': '8px', 
+                                               'color': 'var(--text-primary)'}),
+                                dcc.Input(
+                                    id='contract-name',
+                                    placeholder='ES, GC, NQ, etc.',
+                                    style={'width': '100%'}
+                                )
+                            ], className='col-md-4'),
+                            
+                            html.Div([
+                                html.Label("💰 Tick Value ($)", 
+                                         style={'fontWeight': '600', 'marginBottom': '8px', 
+                                               'color': 'var(--text-primary)'}),
+                                dcc.Input(
+                                    id='tick-value',
+                                    type='number',
+                                    placeholder='12.50',
+                                    style={'width': '100%'}
+                                )
+                            ], className='col-md-4'),
+                            
+                            html.Div([
+                                html.Label("📏 Tick Size", 
+                                         style={'fontWeight': '600', 'marginBottom': '8px', 
+                                               'color': 'var(--text-primary)'}),
+                                dcc.Input(
+                                    id='tick-size',
+                                    type='number',
+                                    step=0.01,
+                                    placeholder='0.25',
+                                    style={'width': '100%'}
+                                )
+                            ], className='col-md-4')
+                        ], className='row', style={'marginBottom': '20px'}),
+                        
+                        html.Button('💾 Save Contract', id='save-contract', n_clicks=0,
+                                  className='profit-button', 
+                                  style={'marginBottom': '20px'}),
+                        
+                        html.Div(id='contract-status', 
+                               style={'margin': '16px 0', 'color': 'var(--profit-green)', 
+                                     'fontWeight': '600'}),
+                        
+                        html.H4("📊 Saved Contracts", 
+                               style={'marginTop': '32px', 'marginBottom': '16px', 
+                                     'color': 'var(--text-primary)'}),
                         dash_table.DataTable(
                             id='contracts-table',
                             columns=[
-                                {'name': 'Contract', 'id': 'name'},
-                                {'name': 'Tick Value', 'id': 'tick_value'},
-                                {'name': 'Tick Size', 'id': 'tick_size'}
+                                {'name': '📋 Contract', 'id': 'name'},
+                                {'name': '💰 Tick Value', 'id': 'tick_value'},
+                                {'name': '📏 Tick Size', 'id': 'tick_size'}
                             ],
-                            style_cell={'textAlign': 'center'}
+                            style_cell={
+                                'textAlign': 'center',
+                                'backgroundColor': 'var(--bg-secondary)',
+                                'color': 'var(--text-primary)',
+                                'border': 'none',
+                                'padding': '12px'
+                            },
+                            style_header={
+                                'backgroundColor': 'var(--bg-tertiary)',
+                                'color': 'var(--text-primary)',
+                                'fontWeight': '600',
+                                'textTransform': 'uppercase',
+                                'fontSize': '14px',
+                                'letterSpacing': '0.5px'
+                            },
+                            style_data={
+                                'backgroundColor': 'var(--bg-secondary)',
+                                'color': 'var(--text-secondary)',
+                                'borderBottom': '1px solid var(--bg-tertiary)'
+                            }
                         )
-                    ], style={'padding': '20px'})
+                    ], className='trading-card')
                 ])
             ])
-        ])
+        ], style={'backgroundColor': 'var(--bg-primary)', 'minHeight': '100vh', 'padding': '20px'})
     
     def _setup_callbacks(self):
         @self.app.callback(
@@ -202,17 +304,52 @@ class TradingDashboard:
                 
         '''
 
+        # Callback to handle saving trade analysis data only
         @self.app.callback(
-            Output('notes-input', 'value', allow_duplicate=True),
+            Output('save-note', 'n_clicks'),
             [Input('save-note', 'n_clicks')],
+            [State('current-date', 'data'),
+             State({'type': 'trade-note', 'index': ALL}, 'value'),
+             State({'type': 'trade-color', 'index': ALL}, 'value'),
+             State({'type': 'trade-id', 'index': ALL}, 'children')],
+            prevent_initial_call=True
+        )
+        def save_trade_analysis(n_clicks, date_str, trade_notes, trade_colors, trade_ids):
+            if n_clicks and n_clicks > 0:
+                # Save all trade notes and colors
+                saved_count = 0
+                for i, trade_id in enumerate(trade_ids):
+                    if trade_id:
+                        # Save trade note
+                        if i < len(trade_notes) and trade_notes[i]:
+                            self.trade_note_manager.save_trade_note(trade_id, trade_notes[i])
+                        
+                        # Save trade color
+                        if i < len(trade_colors) and trade_colors[i]:
+                            self.trade_note_manager.save_trade_color(trade_id, trade_colors[i])
+                        
+                        saved_count += 1
+                
+                print(f"✅ Saved {saved_count} trade analyses for {date_str}")
+            
+            return n_clicks
+
+        # Callback to handle saving daily notes
+        @self.app.callback(
+            Output('save-daily-note', 'n_clicks'),
+            [Input('save-daily-note', 'n_clicks')],
             [State('notes-input', 'value'),
              State('current-date', 'data')],
             prevent_initial_call=True
         )
-        def save_notes(n_clicks, note, date_str):
-            if n_clicks > 0:
-                self.note_manager.save_notes(date_str, note)
-            return note
+        def save_daily_notes(n_clicks, daily_note, date_str):
+            if n_clicks and n_clicks > 0:
+                if daily_note:
+                    self.note_manager.save_notes(date_str, daily_note)
+                    print(f"✅ Saved daily note for {date_str}")
+                else:
+                    print("ℹ️ No daily note to save")
+            return n_clicks
 
         @self.app.callback(
             [Output('contract-status', 'children'),
@@ -234,55 +371,53 @@ class TradingDashboard:
 
             return message, table_data
         
-        # Dynamic callback for trade notes and colors
+        # Dynamic callback for trade card color changes (visual feedback only)
         @self.app.callback(
-            [Output({'type': 'save-status', 'index': MATCH}, 'children'),
-             Output({'type': 'trade-card', 'index': MATCH}, 'style')],
-            [Input({'type': 'save-trade', 'index': MATCH}, 'n_clicks'),
-             Input({'type': 'trade-color', 'index': MATCH}, 'value')],
-            [State({'type': 'trade-note', 'index': MATCH}, 'value'),
-             State({'type': 'trade-id', 'index': MATCH}, 'children'),
-             State({'type': 'trade-card', 'index': MATCH}, 'style')],
+            Output({'type': 'trade-card', 'index': MATCH}, 'style'),
+            [Input({'type': 'trade-color', 'index': MATCH}, 'value')],
+            [State({'type': 'trade-card', 'index': MATCH}, 'style')],
             prevent_initial_call=True
         )
-        def save_trade_data(save_clicks, color_value, note_value, trade_id, current_style):
-            """Save trade note and color when save button is clicked or color changes."""
-            # Define color backgrounds (same as in dashboard_components)
-            color_backgrounds = {
-                'none': '#ffffff',
-                'bad': '#ffebee',        # Light red
-                'uncertain': '#fff3e0', # Light orange  
-                'attention': '#fffde7', # Light yellow
-                'good': '#e8f5e8',      # Light green
-                'fantastic': '#e0f2f1'  # Dollar bill green
+        def update_trade_card_color(color_value, current_style):
+            """Update trade card background when color selection changes (visual feedback only)."""
+            if not color_value:
+                return current_style
+                
+            # Define the same color mapping as in dashboard_components
+            color_mapping = {
+                'none': {
+                    'background': '#2c2c2e',
+                    'border': '#48484a'
+                },
+                'bad': {
+                    'background': 'rgba(255, 69, 58, 0.15)',
+                    'border': '#ff453a'
+                },
+                'uncertain': {
+                    'background': 'rgba(255, 149, 0, 0.15)',
+                    'border': '#ff9500'
+                },
+                'attention': {
+                    'background': 'rgba(255, 204, 2, 0.15)',
+                    'border': '#ffcc02'
+                },
+                'good': {
+                    'background': 'rgba(48, 209, 88, 0.15)',
+                    'border': '#30d158'
+                },
+                'fantastic': {
+                    'background': 'rgba(48, 209, 88, 0.25)',
+                    'border': '#30d158'
+                }
             }
             
-            ctx = dash.callback_context
-            if not ctx.triggered:
-                return "", current_style
+            quality_colors = color_mapping.get(color_value, color_mapping['none'])
             
-            trigger_id = ctx.triggered[0]['prop_id']
+            new_style = current_style.copy()
+            new_style['background'] = quality_colors['background']
+            new_style['border'] = f'2px solid {quality_colors["border"]}'
             
-            # Update background color when color dropdown changes
-            if 'trade-color' in trigger_id and color_value and trade_id:
-                self.trade_note_manager.save_trade_color(trade_id, color_value)
-                new_style = current_style.copy()
-                new_style['backgroundColor'] = color_backgrounds.get(color_value, '#ffffff')
-                return "", new_style
-            
-            # Save all data when save button is clicked
-            elif 'save-trade' in trigger_id and save_clicks and save_clicks > 0 and trade_id:
-                # Save note
-                self.trade_note_manager.save_trade_note(trade_id, note_value or '')
-                # Save color if provided
-                if color_value:
-                    self.trade_note_manager.save_trade_color(trade_id, color_value)
-                    new_style = current_style.copy()
-                    new_style['backgroundColor'] = color_backgrounds.get(color_value, '#ffffff')
-                    return "✓ Saved!", new_style
-                return "✓ Saved!", current_style
-            
-            return "", current_style
+            return new_style
 
         # Monthly summary callbacks - try alternative trigger approach
         @self.app.callback(
